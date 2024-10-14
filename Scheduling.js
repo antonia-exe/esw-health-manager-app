@@ -1,19 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import BackPages from "./components/BackPages";
 import NavBar from './components/NavBar';
 import SelectionSpc from './components/SelectionSpc';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Docs from './components/Docs';
-import DocDetails from './components/DocDetails';
 
 export default function Scheduling({ navigation }) {
   const handleBack = () => {
     navigation.goBack();
   };
 
-  const [currentScreen, setCurrentScreen] = React.useState('Scheduling');
-
+  const [currentScreen, setCurrentScreen] = useState('Scheduling');
+  const [selectedSpecialty, setSelectedSpecialty] = useState(null);
   const navigateToScreen = (screen) => {
     setCurrentScreen(screen);
     navigation.navigate(screen);
@@ -29,14 +28,14 @@ export default function Scheduling({ navigation }) {
       >
         <View style={styles.container}>
           <BackPages title="Agendamento" onBack={handleBack} />
-          <SelectionSpc />
-          <Docs/>
+          <SelectionSpc onSelectSpecialty={setSelectedSpecialty} />
+          <Docs specialty={selectedSpecialty} />
         </View>
       </KeyboardAwareScrollView>
       <NavBar 
           activeScreen={currentScreen}
           onNavigate={navigateToScreen}
-        />
+      />
     </SafeAreaView>
   );
 }

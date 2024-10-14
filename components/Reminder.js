@@ -1,33 +1,59 @@
-import { View, Text, StyleSheet } from 'react-native';
-import React from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import axios from 'axios';
 
-export default function Reminder() {
-    const userData = {
-        pill_name: 'Ibuprofeno',
-        pill_dosage: '200',
-        pill_quant: '2',
-        pill_time: '12:00',
-        pill_day: '2'
-    };
-    
+export default function Reminder({ cpf }) {
+    const [userData, setUserData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`http://10.0.0.40:3001/receitas/${cpf}`);
+                setUserData(response.data); // Aqui recebemos o array de receitas
+            } catch (err) {
+                userData([null, null])
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [cpf]);
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
+    if (error) {
+        return <Text>{error}</Text>;
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Lembretes</Text>
-            <View style={styles.rectangle}>
-                <View style={styles.row}>
-                    <FontAwesome5 name="pills" size={40} color="#9FB285"/>
-                    <View style={styles.textContainer}>
-                        <Text style={styles.name}>{userData.pill_name}, {userData.pill_dosage}mg</Text>
-                        <Text style={styles.dosage}>{userData.pill_quant} pílulas, {userData.pill_day} vezes por dia</Text>
-                        <View style={styles.time}>
-                            <AntDesign name="clockcircle" size={12} color="#ABBC93"/>
-                            <Text style={styles.texttime}>{userData.pill_time}</Text>
+            {userData.length > 0 ? (
+                userData.map((item, index) => (
+                    <View key={index} style={styles.rectangle}>
+                        <View style={styles.row}>
+                            <FontAwesome5 name="pills" size={40} color="#9FB285" />
+                            <View style={styles.textContainer}>
+                                <Text style={styles.name}>{item.medicacao}, {item.dosagem}mg</Text>
+                                <Text style={styles.dosage}>{item.frequencia} vezes por dia</Text>
+                            </View>
                         </View>
                     </View>
+                ))
+            ) : (
+                <View style={styles.rectangle}>
+                            <View style={styles.textContainer2}>
+                            <Text style={styles.othertext}>Você não tem lembretes no momento. Agende uma consulta!</Text> 
+                            </View>
                 </View>
-            </View>
+            )}
         </View>
     );
 }
@@ -44,7 +70,7 @@ const styles = StyleSheet.create({
     rectangle: {
         backgroundColor: '#FFFFFF',
         borderRadius: 10,
-        padding: 20, 
+        padding: 20,
     },
     row: {
         flexDirection: 'row',
@@ -55,12 +81,12 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 16,
-        fontFamily:'Poppins-SemiBold',
+        fontFamily: 'Poppins-SemiBold',
     },
     dosage: {
         fontSize: 14,
         fontFamily: 'Poppins-Regular',
-        paddingBottom: 5
+        paddingBottom: 5,
     },
     time: {
         flexDirection: 'row',
@@ -69,6 +95,14 @@ const styles = StyleSheet.create({
     texttime: {
         marginLeft: 5,
         fontSize: 14,
-        fontFamily:'Poppins-Regular'
+        fontFamily: 'Poppins-Regular',
+    },
+    textContainer2:{
+        marginLeft: 10,
+    },
+    othertext: {
+        fontSize: 16,
+        fontFamily: 'Poppins-SemiBold',
+        paddingRight: 10
     },
 });

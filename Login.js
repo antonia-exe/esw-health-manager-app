@@ -14,15 +14,37 @@ const loadFonts = async () => {
 
 export default function Login() {
   const [form, setForm] = useState({
-    email: '',
+    cpf: '', // CPF do usuário
     password: '',
   });
 
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    navigation.navigate('Home');
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://10.0.0.40:3001/login', { // Atualize o URL conforme necessário
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cpf: form.cpf,
+          password: form.password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao fazer login');
+      }
+
+      const data = await response.json();
+      console.log('Login bem-sucedido:', data);
+      navigation.navigate('Home', {cpf: form.cpf}); // Navegue para a tela inicial ou onde quiser
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      alert('Erro ao fazer login. Verifique seu CPF e senha.'); // Mensagem de erro para o usuário
+    }
   };
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -34,7 +56,7 @@ export default function Login() {
   }, []);
 
   if (!fontsLoaded) {
-    return null; // ou uma tela de carregamento
+    return null; // Retorna null até que as fontes sejam carregadas
   }
 
   return (
@@ -56,12 +78,12 @@ export default function Login() {
               autoCapitalize="none"
               autoCorrect={false}
               clearButtonMode="while-editing"
-              keyboardType="cpf-type"
-              onChangeText={email => setForm({ ...form, email })}
+              keyboardType="numeric" // Ajustado para numeric
+              onChangeText={cpf => setForm({ ...form, cpf })} // Atualizado para cpf
               placeholder="000.000.000-00"
               placeholderTextColor="#616B52"
               style={styles.inputControl}
-              value={form.email}
+              value={form.cpf} // Atualizado para cpf
             />
           </View>
 
@@ -91,7 +113,6 @@ export default function Login() {
             </TouchableOpacity>
           </View>
 
-          {/* Modal para Recuperação de Senha */}
           <Modal
             animationType="slide"
             transparent={true}
@@ -102,7 +123,9 @@ export default function Login() {
           >
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>A recuperação de senha deve ser feita pela administração do hospital. Por favor, entre em contato.</Text>
+                <Text style={styles.modalTitle}>
+                  A recuperação de senha deve ser feita pela administração do hospital. Por favor, entre em contato.
+                </Text>
 
                 <TouchableOpacity
                   style={styles.closeBtn}

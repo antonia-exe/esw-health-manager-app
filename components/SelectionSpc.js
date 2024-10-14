@@ -1,22 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import axios from 'axios';
 
-export default function CustomDropdown() {
+export default function CustomDropdown({ onSelectSpecialty }) {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(null);
-    const [items, setItems] = useState([
-        { label: 'Cardiologia', value: 'item1' },
-        { label: 'Dermatologia', value: 'item2' },
-        { label: 'Geral', value: 'item3' },
-        { label: 'Homeopatia', value: 'item4' },
-        { label: 'Infectologia', value: 'item5' },
-        { label: 'Neurologia', value: 'item6' },
-        { label: 'Oftalmologia', value: 'item7' },
-        { label: 'Oncologia', value: 'item8' },
-        { label: 'Ortopedia', value: 'item9' },
-        { label: 'Pediatria', value: 'item10' },
-    ]);
+    const [items, setItems] = useState([]);
+
+    const fetchSpecialties = async () => {
+        try {
+            const response = await axios.get('http://10.0.0.40:3001/especialidades');
+            const specialties = response.data;
+            const formattedItems = specialties.map(specialty => ({
+                label: specialty.especialidade,
+                value: specialty.especialidade,
+            }));
+            setItems(formattedItems);
+        } catch (error) {
+            console.error("Erro ao buscar especialidades:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSpecialties();
+    }, []);
+
+    const handleSelect = (value) => {
+        setValue(value);
+        onSelectSpecialty(value); 
+    };
 
     return (
         <View style={styles.container}>
@@ -26,16 +39,15 @@ export default function CustomDropdown() {
                 value={value}
                 items={items}
                 setOpen={setOpen}
-                setValue={setValue}
+                setValue={handleSelect} // Atualizado
                 setItems={setItems}
                 placeholder="Escolha uma especialidade"
                 containerStyle={{ height: 40 }} 
                 style={styles.dropdown}
                 dropDownContainerStyle={styles.dropdownContainer}
-                placeholderStyle={styles.placeholderStyle} // estilo do placeholder
-                labelStyle={styles.labelStyle} // estilo do texto selecionado
-                // Adicione essa propriedade para o estilo do texto de cada item
-                itemLabelStyle={styles.itemLabelStyle} // estilo do texto dos itens
+                placeholderStyle={styles.placeholderStyle}
+                labelStyle={styles.labelStyle}
+                itemLabelStyle={styles.itemLabelStyle}
             />
         </View>
     );
@@ -66,17 +78,17 @@ const styles = StyleSheet.create({
     },
     placeholderStyle: {
         fontSize: 16,
-        color: '#8C8C8C', // cor do texto do placeholder
-        fontFamily: 'Poppins-Regular', // define a fonte para o placeholder
+        color: '#8C8C8C',
+        fontFamily: 'Poppins-Regular',
     },
     labelStyle: {
         fontSize: 16,
-        color: '#000', // cor do texto selecionado
-        fontFamily: 'Poppins-SemiBold', // define a fonte para o texto selecionado
+        color: '#000',
+        fontFamily: 'Poppins-SemiBold',
     },
     itemLabelStyle: {
-        fontSize: 16, // define o tamanho da fonte dos itens
-        color: '#000', // cor do texto dos itens
-        fontFamily: 'Poppins', // define a fonte para os itens
+        fontSize: 16,
+        color: '#000',
+        fontFamily: 'Poppins-Regular',
     },
 });

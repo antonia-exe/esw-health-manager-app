@@ -28,13 +28,8 @@ export default function App() {
   }, []);
 
   if (!fontsLoaded) {
-    return null;
+    return null; // Ou pode retornar um componente de loading se preferir
   }
-
-  const handleNavigation = (screen) => {
-    setActiveScreen(screen);
-    navigation.navigate(screen);
-  };
 
   return (
     <NavigationContainer>
@@ -74,7 +69,6 @@ export default function App() {
           component={ProfileUser}
           options={{ headerShown: false }}
         />
-
       </Stack.Navigator>
     </NavigationContainer>
   );

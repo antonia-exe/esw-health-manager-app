@@ -1,33 +1,57 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
-export default function LastAppt() {
-    const doctorData = {
-        name: 'Cristina Yang',
-        specialty: 'Cardiologista',
-        picture: require('../assets/cristina.jpg'),
+export default function LastAppt({ cpf }) {
+    const [lastAppointment, setLastAppointment] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchLastAppointment = async () => {
+        try {
+            const response = await axios.get(`http://10.0.0.40:3001/ultima-consulta/${cpf}`);
+            setLastAppointment(response.data);
+        } catch (err) {
+            setError("Erro ao buscar a última consulta.");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const appointmentData = {
-        date: '12/09/2024',
-        time: '14:00',
-    };
+    useEffect(() => {
+        fetchLastAppointment(); // Chama a função ao montar o componente
+    }, []);
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
+    if (error) {
+        return <Text>{error}</Text>;
+    }
+
+    if (!lastAppointment) {
+        return <Text>Nenhuma consulta encontrada.</Text>;
+    }
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Últimas Consultas</Text>
             <View style={styles.appttCard}>
                 <View style={styles.InfoContainer}>
-                    <Image source={doctorData.picture} style={styles.profilePic} />
+                    <Image source={require('../assets/cristina.jpg')} style={styles.profilePic} />
                     <View style={styles.doctorInfo}>
-                        <Text style={styles.doctorName}>{doctorData.name}</Text>
-                        <Text style={styles.specialty}>{doctorData.specialty}</Text>
+                        <Text style={styles.doctorName}>{lastAppointment.medicoNome}</Text>
+                        <Text style={styles.specialty}>{lastAppointment.medicoEspecialidade}</Text>
                     </View>
                 </View>
                 <View style={styles.dateTimeContainer}>
                     <Ionicons name="calendar" size={20} color="#616B52" />
-                    <Text style={styles.dateTimeText}>{appointmentData.date} às {appointmentData.time}h</Text>
+                    <Text style={styles.dateTimeText}>
+                        {new Date(lastAppointment.dataConsulta).toLocaleDateString()} às {new Date(lastAppointment.dataConsulta).toLocaleTimeString()}h
+                    </Text>
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.button, styles.detailsButton]}>

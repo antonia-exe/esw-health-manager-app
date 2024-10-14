@@ -10,31 +10,29 @@ import Specialties from './components/Specialties';
 import NavBar from './components/NavBar';
 import ConsultCalendar from './components/ConsultCalendar';
 
-export default function Home({ navigation }) {
+export default function Home({ navigation, route }) {
   const [currentScreen, setCurrentScreen] = React.useState('Home');
-  
+  const { cpf } = route.params;
   const navigateToScreen = (screen) => {
     setCurrentScreen(screen);
-    navigation.navigate(screen);
+    navigation.navigate(screen, { cpf });
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#EFEFEF' }}>
-      <StatusBar 
-      barStyle="dark-content" backgroundColor="#EFEFEF" 
-      />
+      <StatusBar barStyle="dark-content" backgroundColor="#EFEFEF" />
       <View style={{ flex: 1 }}>
         <KeyboardAwareScrollView contentContainerStyle={styles.scrollContainer}>
-          <HeaderText />
+          <HeaderText cpf={cpf} />
           <View style={styles.searchBarContainer}>
-            <SearchBar />
+            <SearchBar navigation={navigation} /> 
           </View>
-          <Options onNavigate={navigateToScreen}/>
-          <Reminder />
+          <Options cpf={cpf} onNavigate={navigateToScreen} />
+          <Reminder cpf={cpf} />
           <Specialties />
-          <ConsultCalendar />
+          <ConsultCalendar cpf={cpf} />
         </KeyboardAwareScrollView>
-        <NavBar 
+        <NavBar
           activeScreen={currentScreen}
           onNavigate={navigateToScreen}
         />

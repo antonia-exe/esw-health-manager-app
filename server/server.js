@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise'); // Usando a versão de promessas do mysql2
 const cors = require('cors');
 
 const app = express();
@@ -9,55 +9,184 @@ app.use(cors());
 app.use(express.json()); // Permitir o uso de JSON nas requisições
 
 // Configurando a conexão com o MySQL
-const db = mysql.createConnection({
-  host: 'localhost', // Use 'localhost' se o MySQL estiver rodando localmente
+const dbConfig = {
+  host: '10.0.0.40', // Use 'localhost' se o MySQL estiver rodando localmente
   port: 3306, // A porta padrão do MySQL
   user: 'root', // Seu usuário do MySQL
   password: 'engenharia1', // Sua senha do MySQL
   database: 'clinica' // O nome do banco de dados MySQL
-});
+};
 
-
-db.connect(err => {
-  if (err) {
-    console.log('Erro ao conectar no MySQL:', err);
-  } else {
+// Função para obter conexão ao banco de dados
+const getConnection = async () => {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
     console.log('Conectado ao MySQL!');
+    return connection;
+  } catch (error) {
+    console.error('Erro ao conectar no MySQL:', error);
+    throw error;
+  }
+};
+
+// Rota para buscar paciente pelo CPF
+app.get('/pacientesuser/:cpf', async (req, res) => {
+  const cpf = req.params.cpf; // Pegando o CPF do paciente da URL
+  const query = 'SELECT nome, dataNascimento FROM pacientesuser WHERE CPFusername = ?';
+
+  try {
+    const db = await getConnection();
+    const [result] = await db.query(query, [cpf]);
+
+    if (result.length > 0) {
+      res.json(result[0]); // Retorna o paciente encontrado
+    } else {
+      res.status(404).send('Usuário não encontrado');
+    }
+  } catch (err) {
+    res.status(500).send(err);
   }
 });
 
-app.get('/pacientesuser/:cpf', (req, res) => {
-  const cpf = req.params.cpf; // Pegando o CPF do paciente da URL
-  const query = 'SELECT nome, dataNascimento FROM pacientesuser WHERE CPFusername = ?'; // Use CPFusername em vez de id
-  db.query(query, [cpf], (err, result) => {
-      if (err) {
-          res.status(500).send(err);
-      } else {
-          if (result.length > 0) {
-              res.json(result[0]); // Retorna o paciente encontrado
-          } else {
-              res.status(404).send('Usuário não encontrado');
-          }
-      }
-  });
-});
-
-// Adicione isso ao seu server.js
-app.post('/login', (req, res) => {
-  const { cpf, password } = req.body; // Pegando o CPF e a senha do corpo da requisição
+// Rota de login
+app.post('/login', async (req, res) => {
+  const { cpf, password } = req.body; // Desestruture CPF e senha do corpo da requisição
   const query = 'SELECT * FROM loginpaciente WHERE cpfpaciente = ? AND senhapaciente = ?';
-  db.query(query, [cpf, password], (err, result) => {
-      if (err) {
-          return res.status(500).send(err);
-      }
-      if (result.length > 0) {
-          return res.json({ message: 'Login bem-sucedido', user: result[0] });
-      } else {
-          return res.status(404).send('Credenciais inválidas');
-      }
-  });
+  
+  try {
+    const db = await getConnection();
+    const [result] = await db.query(query, [cpf, password]);
+
+    if (result.length > 0) {
+      return res.json(result[0]); // Login bem-sucedido
+    } else {
+      return res.status(404).send('Usuário não encontrado');
+    }
+  } catch (err) {
+    res.status(500).send('Erro ao fazer login: ' + err);
+  }
 });
 
+// Rota para buscar especialidades
+app.get('/especialidades', async (req, res) => {
+  const query = 'SELECT DISTINCT especialidade FROM medicos';
+
+  try {
+    const db = await getConnection();
+    const [results] = await db.query(query);
+    const specialties = results.map(row => ({ especialidade: row.especialidade }));
+
+    res.json(specialties);
+  } catch (error) {
+    console.error("Erro ao buscar especialidades:", error);
+    res.status(500).json({ error: 'Erro ao buscar especialidades' });
+  }
+});
+
+// Rota para buscar médicos por especialidade
+app.get('/medicos/:especialidade', async (req, res) => {
+  const especialidade = req.params.especialidade;
+  const query = 'SELECT * FROM medicos WHERE especialidade = ?';
+
+  try {
+    const db = await getConnection();
+    const [results] = await db.query(query, [especialidade]);
+
+    res.json(results);
+  } catch (err) {
+    console.error('Erro ao buscar médicos:', err);
+    res.status(500).json({ error: 'Erro ao buscar médicos' });
+  }
+});
+
+// Rota para buscar a última consulta de um paciente
+app.get('/ultima-consulta/:cpf', async (req, res) => {
+  const cpf = req.params.cpf;
+  const query = `
+    SELECT a.dataConsulta, m.nome AS medicoNome, m.especialidade AS medicoEspecialidade
+    FROM agendamentos a
+    JOIN medicos m ON a.medicoIdAgendamento = m.id
+    WHERE a.pacienteCPFagendamento = ? AND a.dataConsulta < NOW()
+    ORDER BY a.dataConsulta DESC
+    LIMIT 1
+  `;
+
+  try {
+    const db = await getConnection();
+    const [result] = await db.query(query, [cpf]);
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Nenhuma consulta anterior encontrada." });
+    }
+
+    res.json(result[0]);
+  } catch (error) {
+    console.error("Erro ao buscar última consulta:", error);
+    res.status(500).json({ error: "Erro ao buscar última consulta" });
+  }
+});
+
+// Rota para buscar receitas de um paciente
+app.get('/receitas/:cpf', async (req, res) => {
+  const cpf = req.params.cpf;
+  const query = 'SELECT medicacao, dosagem, frequencia FROM receitas WHERE pacienteCPFreceita = ?';
+
+  try {
+    const db = await getConnection(); // Conexão ao banco de dados
+    const [results] = await db.query(query, [cpf]);
+
+    if (results.length > 0) {
+      res.json(results); // Retorna todas as receitas encontradas
+    } else {
+      res.status(404).send('Nenhuma receita encontrada');
+    }
+  } catch (error) {
+    console.error('Erro ao buscar receitas:', error);
+    res.status(500).send('Erro ao buscar receitas');
+  }
+});
+
+
+app.get('/consultas/:cpf', async (req, res) => {
+  const cpf = req.params.cpf;
+  const query = 'SELECT DATE(dataConsulta) as dataConsulta FROM agendamentos WHERE pacienteCPFagendamento = ?';
+
+  try {
+    const db = await getConnection();
+    const [results] = await db.query(query, [cpf]);
+
+    if (results.length > 0) {
+      res.json(results); // Retorna todas as consultas encontradas
+    } else {
+      res.status(404).send('Nenhuma consulta encontrada');
+    }
+  } catch (error) {
+    console.error('Erro ao buscar consultas:', error);
+    res.status(500).send('Erro ao buscar consultas');
+  }
+});
+
+app.get('/medicos/search/:query', async (req, res) => {
+  const query = req.params.query;
+  const sql = `
+    SELECT * FROM medicos 
+    WHERE nome LIKE ? OR especialidade LIKE ?
+  `;
+  
+  try {
+    const db = await getConnection();
+    const [results] = await db.query(sql, [`%${query}%`, `%${query}%`]);
+
+    if (results.length > 0) {
+      res.json(results);
+    } else {
+      res.status(404).send('Nenhum médico encontrado');
+    }
+  } catch (error) {
+    console.error('Erro ao buscar médicos:', error);
+    res.status(500).send('Erro ao buscar médicos');
+  }
+});
 
 // Iniciar o servidor
 app.listen(port, () => {

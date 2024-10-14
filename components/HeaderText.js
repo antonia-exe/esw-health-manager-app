@@ -1,20 +1,42 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
-import React from 'react';
+import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios'; // Adicione o Axios se ainda não estiver no projeto
 
-export default function HeaderText() {
-    const userData = {
-        name: 'Lívia Bezerra',
-        picture: require('../assets/chuu-do-.jpg') // Utilize require aqui para carregar a imagem
-    };
+export default function HeaderText({ cpf }) {
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true); // Para controlar o estado de carregamento
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get(`http://10.0.0.40:3001/pacientesuser/${cpf}`); // Substitua IP pelo seu IP real
+                setUserData(response.data); // Supondo que a resposta tenha um campo 'nome'
+            } catch (error) {
+                console.error("Erro ao buscar dados do usuário:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, [cpf]); // Executa a requisição quando o componente monta ou o CPF muda
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />; // Mostra um indicador de carregamento
+    }
+
+    if (!userData) {
+        return <Text>Usuário não encontrado</Text>; // Exibe mensagem se não encontrar o usuário
+    }
 
     return (
         <View style={styles.container}>
-                <Image source={userData.picture} style={styles.profilepic} />
-                <View style={styles.textContainer}>
+            <Image source={require('../assets/chuu-do-.jpg')} style={styles.profilepic} />
+            <View style={styles.textContainer}>
                 <Text style={styles.text}>
-                    Olá, <Text style={styles.username}>{userData.name}</Text>. Como podemos ajudar hoje?
+                    Olá, <Text style={styles.username}>{userData.nome}</Text>. Como podemos ajudar hoje?
                 </Text>
-                </View>
+            </View>
         </View>
     );
 }
@@ -44,6 +66,6 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 5,
-        marginRight:12
+        marginRight: 12
     }
 });

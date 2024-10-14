@@ -6,12 +6,12 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Prontuario from '../Prontuario';
 
-export default function Options({ onNavigate }) {
+export default function Options({ cpf, onNavigate }) {
   return (
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
         <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.button} onPress={() => onNavigate('Prontuario')}>
+          <TouchableOpacity style={styles.button} onPress={() => onNavigate('Prontuario', {cpf})}>
             <FontAwesome5 name="file-medical-alt" size={26} color="#FFF" />
           </TouchableOpacity>
           <Text style={styles.buttonText}>Prontuário</Text>

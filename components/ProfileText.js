@@ -1,13 +1,11 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-export default function ProfileText() {
-    const [userData, setUserData] = useState({
-        name: '',
-        age: '',
-        picture: require('../assets/chuu-do-.jpg') // Imagem fixa
-    });
+export default function ProfileText({ cpf }) {
+    const [userData, setUserData] = useState(null); // Inicializa como null
+    const [loading, setLoading] = useState(true); // Estado de carregamento
+    const defaultPicture = require('../assets/chuu-do-.jpg'); // Imagem fixa
 
     // Função para calcular a idade com base na data de nascimento
     const calcularIdade = (dataNascimento) => {
@@ -23,21 +21,34 @@ export default function ProfileText() {
     };
 
     useEffect(() => {
-        // Faça a requisição ao backend para buscar o nome e a data de nascimento
-        axios.get('http://localhost:3001/pacientesuser/1') // Alterar o ID conforme necessário
+        // Requisição ao backend para buscar os dados do usuário usando o CPF
+        axios.get(`http://10.0.0.40:3001/pacientesuser/${cpf}`)
             .then((response) => {
                 const data = response.data;
                 // Atualizar o estado com os dados do usuário
-                setUserData({
-                    ...userData,
-                    name: data.nome,
-                    age: calcularIdade(data.dataNascimento) // Calcular a idade a partir da data de nascimento
-                });
+                if (data) {
+                    setUserData({
+                        name: data.nome,
+                        age: calcularIdade(data.dataNascimento), // Calcular a idade
+                        picture: defaultPicture, // Imagem fixa
+                    });
+                }
             })
             .catch((error) => {
                 console.error('Erro ao buscar dados do usuário:', error);
+            })
+            .finally(() => {
+                setLoading(false); // Indica que o carregamento foi concluído
             });
-    }, []);
+    }, [cpf]);
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />; // Exibe um indicador de carregamento
+    }
+
+    if (!userData) {
+        return <Text>Usuário não encontrado.</Text>; // Mensagem caso não encontre o usuário
+    }
 
     return (
         <View style={styles.container}>
@@ -60,20 +71,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingLeft: 24,
-        paddingBottom: 20 
+        paddingBottom: 20,
     },
     textContainer: {
         flex: 1,
-        marginRight: 90        
+        marginRight: 90,
     },
     text: {
         fontSize: 18,
-        fontFamily: 'Poppins-SemiBold'
+        fontFamily: 'Poppins-SemiBold',
     },
     username: {
         fontSize: 18,
         fontFamily: 'Poppins-SemiBold',
-        color: '#ABBC93'
+        color: '#ABBC93',
     },
     ageText: {
         fontSize: 16,
@@ -84,6 +95,6 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 5,
-        marginRight: 12
-    }
+        marginRight: 12,
+    },
 });
