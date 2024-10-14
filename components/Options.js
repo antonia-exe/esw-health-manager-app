@@ -67,6 +67,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontSize: 16,
     color: '#000',
-    fontFamily: 'Poppins',
+    fontFamily: 'Poppins-Regular',
   },
 });

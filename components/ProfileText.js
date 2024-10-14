@@ -1,12 +1,43 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export default function ProfileText() {
-    const userData = {
-        name: 'Lívia Bezerra',
-        age: 20,
-        picture: require('../assets/chuu-do-.jpg')
+    const [userData, setUserData] = useState({
+        name: '',
+        age: '',
+        picture: require('../assets/chuu-do-.jpg') // Imagem fixa
+    });
+
+    // Função para calcular a idade com base na data de nascimento
+    const calcularIdade = (dataNascimento) => {
+        const hoje = new Date();
+        const nascimento = new Date(dataNascimento);
+        let idade = hoje.getFullYear() - nascimento.getFullYear();
+        const mes = hoje.getMonth() - nascimento.getMonth();
+
+        if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+            idade--;
+        }
+        return idade;
     };
+
+    useEffect(() => {
+        // Faça a requisição ao backend para buscar o nome e a data de nascimento
+        axios.get('http://localhost:3001/pacientesuser/1') // Alterar o ID conforme necessário
+            .then((response) => {
+                const data = response.data;
+                // Atualizar o estado com os dados do usuário
+                setUserData({
+                    ...userData,
+                    name: data.nome,
+                    age: calcularIdade(data.dataNascimento) // Calcular a idade a partir da data de nascimento
+                });
+            })
+            .catch((error) => {
+                console.error('Erro ao buscar dados do usuário:', error);
+            });
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -46,8 +77,8 @@ const styles = StyleSheet.create({
     },
     ageText: {
         fontSize: 16,
-        fontFamily: 'Poppins-Regular', // Ajuste a fonte conforme necessário
-        color: '#000', // Você pode mudar a cor conforme necessário
+        fontFamily: 'Poppins-Regular',
+        color: '#000',
     },
     profilepic: {
         width: 60,

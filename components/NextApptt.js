@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     container: {
         paddingLeft: 24,
         paddingRight: 24,
-        paddingTop: 20
+        paddingTop: 10
     },
     title: {
         fontSize: 22,
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     },
     specialty: {
         fontSize: 16,
-        fontFamily: 'Poppins',
+        fontFamily: 'Poppins-Regular',
         color: '#000',
     },
     dateTimeContainer: {
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
         paddingLeft: 70
     },
     dateTimeText: {
-        fontFamily: 'Poppins',
+        fontFamily: 'Poppins-Regular',
         marginLeft: 5, // Espaço entre o ícone e o texto
     },
     buttonContainer: {

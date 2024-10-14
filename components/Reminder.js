@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     },
     dosage: {
         fontSize: 14,
-        fontFamily: 'Poppins',
+        fontFamily: 'Poppins-Regular',
         paddingBottom: 5
     },
     time: {
@@ -69,6 +69,6 @@ const styles = StyleSheet.create({
     texttime: {
         marginLeft: 5,
         fontSize: 14,
-        fontFamily:'Poppins'
+        fontFamily:'Poppins-Regular'
     },
 });

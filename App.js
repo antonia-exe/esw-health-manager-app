@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import * as Font from 'expo-font'; // Certifique-se de importar o módulo correto
+import * as Font from 'expo-font'; 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -7,6 +7,8 @@ import Login from './Login';
 import Home from './Home';
 import Prontuario from './Prontuario';
 import Scheduling from './Scheduling';
+import DocsPfp from './DocsPfp';
+import ProfileUser from './ProfileUser';
 
 const loadFonts = async () => {
   await Font.loadAsync({
@@ -60,6 +62,19 @@ export default function App() {
           component={Scheduling}
           options={{ headerShown: false }}
         />
+
+        <Stack.Screen
+          name='DocsPfp'
+          component={DocsPfp}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name='ProfileUser'
+          component={ProfileUser}
+          options={{ headerShown: false }}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -7,7 +7,6 @@ import Feather from '@expo/vector-icons/Feather';
 export default function NavBar({ activeScreen, onNavigate }) {
     
     useEffect(() => {
-        // Atualiza a tela ativa quando o componente for montado ou quando o activeScreen mudar
         const unsubscribe = onNavigate(activeScreen);
         return () => unsubscribe;
     }, [activeScreen]);
@@ -37,13 +36,13 @@ export default function NavBar({ activeScreen, onNavigate }) {
             </TouchableOpacity>
 
             <TouchableOpacity 
-                onPress={() => onNavigate('Profile')}
-                disabled={activeScreen === 'Profile'}
+                onPress={() => onNavigate('ProfileUser')}
+                disabled={activeScreen === 'ProfileUser'}
             >
                 <Feather 
                     name="user" 
                     size={30} 
-                    color={activeScreen === 'Profile' ? '#616B52' : '#C2D5A8'} 
+                    color={activeScreen === 'ProfileUser' ? '#616B52' : '#C2D5A8'} 
                 />
             </TouchableOpacity>
         </View>

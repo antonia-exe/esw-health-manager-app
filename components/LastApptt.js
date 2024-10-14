@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     },
     specialty: {
         fontSize: 16,
-        fontFamily: 'Poppins',
+        fontFamily: 'Poppins-Regular',
         color: '#000',
     },
     dateTimeContainer: {
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         paddingLeft: 70
     },
     dateTimeText: {
-        fontFamily: 'Poppins',
+        fontFamily: 'Poppins-Regular',
         marginLeft: 5,
     },
     buttonContainer: {

@@ -1,22 +1,14 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; 
-import { useNavigation } from '@react-navigation/native';
 
-export default function Docs() {
-    
-    const navigation = useNavigation();
-    const handleProfilePress = () => {
-        navigation.navigate('DocsPfp');
-    };
-
+export default function DocInfoPfp() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Principais médicos</Text>
-            <TouchableOpacity style={styles.profileContainer} onPress={handleProfilePress}>
+            <View style={styles.profileContainer}>
                 <Image 
-                    source={{ uri: 'https://via.placeholder.com/100' }} // Substitua pela URL da imagem de perfil
+                    source={{ uri: 'https://via.placeholder.com/100' }}
                     style={styles.profileImage} 
                 />
                 <Text style={styles.name}>Fahlada Thananusak</Text>
@@ -32,7 +24,7 @@ export default function Docs() {
                         />
                     ))}
                 </View>
-            </TouchableOpacity>
+            </View>
         </View>
     );
 }

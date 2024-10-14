@@ -8,7 +8,7 @@ import Options from './components/Options';
 import Reminder from './components/Reminder';
 import Specialties from './components/Specialties';
 import NavBar from './components/NavBar';
-import ConsultCalendar from './components/ConsultCalendar'; // Importando o calendário
+import ConsultCalendar from './components/ConsultCalendar';
 
 export default function Home({ navigation }) {
   const [currentScreen, setCurrentScreen] = React.useState('Home');

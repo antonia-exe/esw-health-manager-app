@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, SafeAreaView} from 'react-native';
-
+import { View, StyleSheet, SafeAreaView } from 'react-native';
 import BackPages from "./components/BackPages";
 import NavBar from './components/NavBar';
-
+import SelectionSpc from './components/SelectionSpc';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Docs from './components/Docs';
+import DocDetails from './components/DocDetails';
 
 export default function Scheduling({ navigation }) {
   const handleBack = () => {
@@ -19,24 +20,37 @@ export default function Scheduling({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#EFEFEF' }}>
-      <View style={styles.container}>
-        <KeyboardAwareScrollView>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAwareScrollView 
+        style={styles.scrollView} 
+        resetScrollToCoords={{ x: 0, y: 0 }} 
+        scrollEnabled={true} 
+        keyboardShouldPersistTaps='handled' 
+      >
+        <View style={styles.container}>
           <BackPages title="Agendamento" onBack={handleBack} />
-        </KeyboardAwareScrollView>
-        <NavBar 
-            activeScreen={currentScreen}
-            onNavigate={navigateToScreen}
-          />
-      </View>
+          <SelectionSpc />
+          <Docs/>
+        </View>
+      </KeyboardAwareScrollView>
+      <NavBar 
+          activeScreen={currentScreen}
+          onNavigate={navigateToScreen}
+        />
     </SafeAreaView>
-    
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#EFEFEF'
-      },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#EFEFEF',
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  scrollView: {
+    flex: 1,
+  },
 });

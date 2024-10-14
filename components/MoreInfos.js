@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     buttonText: {
         flex: 1,
         fontSize: 16,
-        fontFamily: 'Poppins',
+        fontFamily: 'Poppins-Regular',
         marginLeft: 10,
     },
 });
