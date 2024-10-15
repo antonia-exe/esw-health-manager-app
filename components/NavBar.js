@@ -4,7 +4,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
 
-export default function NavBar({ activeScreen, onNavigate }) {
+export default function NavBar({ activeScreen, onNavigate, cpf }) {
     
     useEffect(() => {
         const unsubscribe = onNavigate(activeScreen);
@@ -16,6 +16,7 @@ export default function NavBar({ activeScreen, onNavigate }) {
             <TouchableOpacity 
                 onPress={() => onNavigate('Home')}
                 disabled={activeScreen === 'Home'}
+                cpf={cpf}
             >
                 <FontAwesome6 
                     name="house" 
@@ -27,6 +28,7 @@ export default function NavBar({ activeScreen, onNavigate }) {
             <TouchableOpacity 
                 onPress={() => onNavigate('Scheduling')}
                 disabled={activeScreen === 'Scheduling'}
+                cpf={cpf} 
             >
                 <Entypo 
                     name="squared-plus" 
@@ -36,13 +38,17 @@ export default function NavBar({ activeScreen, onNavigate }) {
             </TouchableOpacity>
 
             <TouchableOpacity 
-                onPress={() => onNavigate('ProfileUser')}
+                onPress={() => {
+                    console.log('Navegando para ProfileUser com CPF:', cpf); // Adiciona o console.log aqui
+                    onNavigate('ProfileUser');
+                }}
+                cpf={cpf} 
                 disabled={activeScreen === 'ProfileUser'}
             >
                 <Feather 
                     name="user" 
                     size={30} 
-                    color={activeScreen === 'ProfileUser' ? '#616B52' : '#C2D5A8'} 
+                    color={activeScreen === 'ProfileUser' ? '#616B52' : '#C2D5A8'}
                 />
             </TouchableOpacity>
         </View>

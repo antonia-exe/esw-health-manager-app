@@ -41,6 +41,7 @@ export default function DocsPfp({ navigation, route }) {
         <NavBar 
             activeScreen={currentScreen}
             onNavigate={navigateToScreen}
+            cpf={cpf}
           />
       </View>
     </SafeAreaView>

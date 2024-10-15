@@ -35,6 +35,7 @@ export default function Home({ navigation, route }) {
         <NavBar
           activeScreen={currentScreen}
           onNavigate={navigateToScreen}
+          cpf={cpf}
         />
       </View>
     </SafeAreaView>

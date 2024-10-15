@@ -37,6 +37,7 @@ export default function Scheduling({ navigation, route }) {
       <NavBar 
           activeScreen={currentScreen}
           onNavigate={navigateToScreen}
+          cpf={cpf}
       />
     </SafeAreaView>
   );

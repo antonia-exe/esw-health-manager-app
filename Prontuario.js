@@ -42,6 +42,7 @@ export default function Prontuario({ navigation, route }) {
                 <NavBar 
                     activeScreen={currentScreen}
                     onNavigate={navigateToScreen}
+                    cpf={cpf}
                 />
             </View>
         </SafeAreaView>

@@ -19,7 +19,7 @@ export default function NextAppt({ cpf }) {
 
     useEffect(() => {
         fetchNextAppointment();
-    }, []);
+    }, [cpf]);
 
     if (loading) {
         return <ActivityIndicator size="large" color="#0000ff" />;
