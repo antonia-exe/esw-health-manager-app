@@ -10,16 +10,22 @@ import DocInfoPfp from './components/DocInfoPfp';
 import SelectDay from './components/SelectDay';
 import SelectHours from './components/SelectHours';
 
-export default function DocsPfp({ navigation }) {
+export default function DocsPfp({ navigation, route }) {
+  const [currentScreen, setCurrentScreen] = React.useState('DocsPfp');
+  const { doctor, cpf } = route.params;
+
+  const medicoId = doctor.id;
+
+  console.log('Dados recebidos em DocsPfp:', { cpf });
+
   const handleBack = () => {
     navigation.goBack();
   };
 
-  const [currentScreen, setCurrentScreen] = React.useState('DocsPfp');
 
   const navigateToScreen = (screen) => {
     setCurrentScreen(screen);
-    navigation.navigate(screen);
+    navigation.navigate(screen, { doctor, cpf });
   };
 
   return (
@@ -27,10 +33,10 @@ export default function DocsPfp({ navigation }) {
       <View style={styles.container}>
         <KeyboardAwareScrollView>
           <BackPages title="Médico" onBack={handleBack} />
-          <DocInfoPfp/>
-          <DocDetails/>
-          <SelectDay/>
-          <SelectHours/>
+          <DocInfoPfp doctor={doctor}/>
+          <DocDetails />
+          <SelectDay medicoId={medicoId} cpf={cpf}/>
+          <SelectHours medicoId={medicoId} cpf={cpf} />
         </KeyboardAwareScrollView>
         <NavBar 
             activeScreen={currentScreen}

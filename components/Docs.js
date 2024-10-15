@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios'; // Importando axios
 
-export default function Docs({ specialty }) {
+export default function Docs({ specialty, cpf }) {
     const navigation = useNavigation();
     const [doctors, setDoctors] = useState([]);
 
@@ -25,7 +25,8 @@ export default function Docs({ specialty }) {
     }, [specialty]);
 
     const handleProfilePress = (doctor) => {
-        navigation.navigate('DocsPfp', { doctor }); // Passa informações do médico para a próxima tela
+        console.log("CPF que está sendo passado:", cpf);
+        navigation.navigate('DocsPfp', { doctor, cpf });
     };
 
     return (
@@ -34,7 +35,7 @@ export default function Docs({ specialty }) {
             {doctors.map((doctor, index) => (
                 <TouchableOpacity key={index} style={styles.profileContainer} onPress={() => handleProfilePress(doctor)}>
                     <Image 
-                        source={{ uri: 'https://via.placeholder.com/100' }} // Substitua pela URL da imagem de perfil
+                        source={{ uri: 'https://via.placeholder.com/100' }}
                         style={styles.profileImage} 
                     />
                     <Text style={styles.name}>{doctor.nome}</Text>

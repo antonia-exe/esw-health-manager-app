@@ -18,7 +18,7 @@ export default function Options({ cpf, onNavigate }) {
         </View>
 
         <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.button} onPress={() => onNavigate('Scheduling')}>
+          <TouchableOpacity style={styles.button} onPress={() => onNavigate('Scheduling', {cpf})}>
             <Ionicons name="calendar" size={30} color="#FFF" />
           </TouchableOpacity>
           <Text style={styles.buttonText}>Consultas</Text>

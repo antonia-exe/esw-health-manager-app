@@ -1,29 +1,16 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; 
+import { View, Text, Image, StyleSheet } from 'react-native';
 
-export default function DocInfoPfp() {
-
+export default function DocInfoPfp({ doctor }) {
     return (
         <View style={styles.container}>
             <View style={styles.profileContainer}>
                 <Image 
-                    source={{ uri: 'https://via.placeholder.com/100' }}
+                    source={{ uri: doctor?.imagem || 'https://via.placeholder.com/100' }} 
                     style={styles.profileImage} 
                 />
-                <Text style={styles.name}>Fahlada Thananusak</Text>
-                <Text style={styles.description}>Cardiologista</Text>
-                <View style={styles.starsContainer}>
-                    {[...Array(5)].map((_, index) => (
-                        <Icon 
-                            key={index} 
-                            name="star" 
-                            size={20} 
-                            color="#ABBC93" 
-                            style={styles.star} 
-                        />
-                    ))}
-                </View>
+                <Text style={styles.name}>{doctor?.nome || 'Nome do Médico'}</Text> 
+                <Text style={styles.description}>{doctor?.especialidade || 'Especialidade'}</Text>
             </View>
         </View>
     );
@@ -36,11 +23,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#EFEFEF',
         justifyContent: 'center',
         alignItems: 'left',
-    },
-    title: {
-        fontSize: 24,
-        fontFamily: 'Poppins-Bold',
-        marginBottom: 5,
     },
     profileContainer: {
         width: '100%',
@@ -68,12 +50,5 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         textAlign: 'center',
         fontFamily: 'Poppins-Regular'
-    },
-    starsContainer: {
-        flexDirection: 'row',
-    },
-    star: {
-        fontSize: 20,
-        margin: 2, 
     },
 });

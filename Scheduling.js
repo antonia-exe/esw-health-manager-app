@@ -6,16 +6,18 @@ import SelectionSpc from './components/SelectionSpc';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Docs from './components/Docs';
 
-export default function Scheduling({ navigation }) {
+export default function Scheduling({ navigation, route }) {
+  const {cpf} = route.params;
+
   const handleBack = () => {
     navigation.goBack();
   };
-
   const [currentScreen, setCurrentScreen] = useState('Scheduling');
   const [selectedSpecialty, setSelectedSpecialty] = useState(null);
+
   const navigateToScreen = (screen) => {
     setCurrentScreen(screen);
-    navigation.navigate(screen);
+    navigation.navigate(screen, { cpf });
   };
 
   return (
@@ -29,7 +31,7 @@ export default function Scheduling({ navigation }) {
         <View style={styles.container}>
           <BackPages title="Agendamento" onBack={handleBack} />
           <SelectionSpc onSelectSpecialty={setSelectedSpecialty} />
-          <Docs specialty={selectedSpecialty} />
+          <Docs specialty={selectedSpecialty} cpf={cpf}/>
         </View>
       </KeyboardAwareScrollView>
       <NavBar 

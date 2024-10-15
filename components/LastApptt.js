@@ -12,9 +12,6 @@ export default function LastAppt({ cpf }) {
         try {
             const response = await axios.get(`http://10.0.0.40:3001/ultima-consulta/${cpf}`);
             setLastAppointment(response.data);
-        } catch (err) {
-            setError("Erro ao buscar a última consulta.");
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -33,12 +30,12 @@ export default function LastAppt({ cpf }) {
     }
 
     if (!lastAppointment) {
-        return <Text>Nenhuma consulta encontrada.</Text>;
+        return <Text></Text>;
     }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Últimas Consultas</Text>
+            <Text style={styles.title}>Última Consulta</Text>
             <View style={styles.appttCard}>
                 <View style={styles.InfoContainer}>
                     <Image source={require('../assets/cristina.jpg')} style={styles.profilePic} />

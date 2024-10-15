@@ -1,33 +1,63 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
-export default function NextAppt() {
-    const doctorData = {
-        name: 'Fahlada Thananusak',
-        specialty: 'Cardiologista',
-        picture: require('../assets/fahlada.jpg'),
+export default function NextAppt({ cpf }) {
+    const [nextAppointment, setNextAppointment] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchNextAppointment = async () => {
+        try {
+            const response = await axios.get(`http://10.0.0.40:3001/proxima-consulta/${cpf}`);
+            setNextAppointment(response.data);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const appointmentData = {
-        date: '10/10/2024',
-        time: '14:00',
-    };
+    useEffect(() => {
+        fetchNextAppointment();
+    }, []);
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
+    if (error) {
+        return <Text>{error}</Text>;
+    }
+
+    if (!nextAppointment) {
+        return (
+            <View style={styles.container}>
+                <View style={styles.noApptCard}>
+                    <Text style={styles.noApptText}>Não há consultas agendadas</Text>
+                    <TouchableOpacity style={styles.scheduleButton}>
+                        <Text style={styles.scheduleButtonText}>Agendar agora</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Próxima Consulta</Text>
             <View style={styles.appttCard}>
                 <View style={styles.InfoContainer}>
-                    <Image source={doctorData.picture} style={styles.profilePic} />
+                    <Image source={require('../assets/fahlada.jpg')} style={styles.profilePic} />
                     <View style={styles.doctorInfo}>
-                        <Text style={styles.doctorName}>{doctorData.name}</Text>
-                        <Text style={styles.specialty}>{doctorData.specialty}</Text>
+                        <Text style={styles.doctorName}>{nextAppointment.medicoNome}</Text>
+                        <Text style={styles.specialty}>{nextAppointment.medicoEspecialidade}</Text>
                     </View>
                 </View>
                 <View style={styles.dateTimeContainer}>
                     <Ionicons name="calendar" size={20} color="#616B52" />
-                    <Text style={styles.dateTimeText}>{appointmentData.date} às {appointmentData.time}h</Text>
+                    <Text style={styles.dateTimeText}>
+                        {new Date(nextAppointment.dataConsulta).toLocaleDateString()} às {new Date(nextAppointment.dataConsulta).toLocaleTimeString()}h
+                    </Text>
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={[styles.button, styles.cancelButton]}>
@@ -46,7 +76,7 @@ const styles = StyleSheet.create({
     container: {
         paddingLeft: 24,
         paddingRight: 24,
-        paddingTop: 10
+        paddingTop: 10,
     },
     title: {
         fontSize: 22,
@@ -88,17 +118,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginVertical: 5,
-        paddingLeft: 70
+        paddingLeft: 70,
     },
     dateTimeText: {
         fontFamily: 'Poppins-Regular',
-        marginLeft: 5, // Espaço entre o ícone e o texto
+        marginLeft: 5,
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'center', // Centraliza os botões
-        paddingHorizontal: 195, // Adiciona padding lateral de 10
-        marginTop: 20, // Espaço acima dos botões
+        justifyContent: 'center',
+        paddingHorizontal: 195,
+        marginTop: 20,
     },
     button: {
         width: 118,
@@ -106,7 +136,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: 5, // Espaçamento horizontal entre os botões
+        marginHorizontal: 5,
     },
     cancelButton: {
         backgroundColor: '#BFBFBF',
@@ -118,4 +148,28 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: 'Poppins-Bold',
     },
+    noApptCard: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    noApptText: {
+        fontSize: 18,
+        fontFamily: 'Poppins-Regular',
+        color: '#000',
+        marginBottom: 10,
+    },
+    scheduleButton: {
+        backgroundColor: '#ABBC92',
+        borderRadius: 5,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    scheduleButtonText: {
+        color: '#FFF',
+        fontSize: 16,
+        fontFamily: 'Poppins-Bold',
+    },
+
 });

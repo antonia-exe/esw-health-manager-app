@@ -146,7 +146,6 @@ app.get('/receitas/:cpf', async (req, res) => {
   }
 });
 
-
 app.get('/consultas/:cpf', async (req, res) => {
   const cpf = req.params.cpf;
   const query = 'SELECT DATE(dataConsulta) as dataConsulta FROM agendamentos WHERE pacienteCPFagendamento = ?';
@@ -187,6 +186,71 @@ app.get('/medicos/search/:query', async (req, res) => {
     res.status(500).send('Erro ao buscar médicos');
   }
 });
+
+//PROXIMA CONSULTA
+app.get('/proxima-consulta/:cpf', async (req, res) => {
+  const cpf = req.params.cpf;
+
+  try {
+      const connection = await mysql.createConnection(dbConfig);
+
+      // Consulta para buscar o próximo agendamento com data futura
+      const [rows] = await connection.execute(`
+          SELECT a.dataConsulta, m.nome AS medicoNome, m.especialidade AS medicoEspecialidade
+          FROM agendamentos a
+          JOIN medicos m ON a.medicoIdAgendamento = m.id
+          WHERE a.pacienteCPFagendamento = ? 
+            AND a.dataConsulta > NOW()  -- Somente consultas futuras
+            AND a.status = 'Agendado'
+          ORDER BY a.dataConsulta ASC  -- Ordena pela consulta mais próxima
+          LIMIT 1
+      `, [cpf]);
+
+      if (rows.length === 0) {
+          return res.status(404).json({ message: 'Nenhuma consulta futura encontrada.' });
+      }
+
+      res.json(rows[0]); // Retorna a próxima consulta encontrada
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Erro ao buscar a consulta.' });
+  }
+});
+
+//BUSCAR AGENDAMENTOS DE UM MÉDICO
+app.get('/agendamentos/:medicoId', async (req, res) => {
+  const medicoId = req.params.medicoId;
+  const query = 'SELECT * FROM agendamentos WHERE medicoIdAgendamento = ?';
+  
+  try {
+    const db = await getConnection(); // Obtenha a conexão ao banco de dados
+    const [results] = await db.query(query, [medicoId]); // Execute a consulta
+
+    return res.status(200).json(results); // Retorne os resultados
+  } catch (error) {
+    console.error('Erro ao buscar agendamentos:', error);
+    return res.status(500).json({ error: 'Erro ao buscar agendamentos' });
+  }
+});
+
+//AGENDAR UM PACIENTE
+app.post('/agendamentos-cadastro', async (req, res) => {
+  const { dataConsulta, cpf, medicoId } = req.body;
+  const sqlInsert = 'INSERT INTO Agendamentos (pacienteCPFagendamento, medicoIdAgendamento, dataConsulta) VALUES (?, ?, ?)';
+
+  try {
+    const db = await getConnection(); // Obtém a conexão com o banco
+    await db.query(sqlInsert, [cpf, medicoId, dataConsulta]); // Executa a query
+
+    // Modifique esta linha para retornar um objeto JSON em caso de sucesso
+    res.status(200).json({ message: 'Agendamento realizado com sucesso' });
+  } catch (err) {
+    console.error('Erro ao realizar agendamento:', err);
+    res.status(500).json({ error: 'Erro ao realizar agendamento' });
+  }
+});
+
+
 
 // Iniciar o servidor
 app.listen(port, () => {
